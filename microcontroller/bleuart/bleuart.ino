@@ -11,9 +11,22 @@
  All text above, and the splash screen below must be included in
  any redistribution
 *********************************************************************/
+
+/*********************************************************************
+hi guys! <3 Emma
+this is so neat
+Hi!
+Testing - Anjali
+
+more testing
+*********************************************************************/
+
+
+
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
+#include <Adafruit_Sensor.h>
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -29,7 +42,7 @@ void setup()
   // Blocking wait for connection when debug mode is enabled via IDE
   while ( !Serial ) yield();
 #endif
-  
+
   Serial.println("Bluefruit52 BLEUART Example");
   Serial.println("---------------------------\n");
 
@@ -38,7 +51,7 @@ void setup()
   // here in case you want to control this LED manually via PIN 19
   Bluefruit.autoConnLed(true);
 
-  // Config the peripheral connection with maximum bandwidth 
+  // Config the peripheral connection with maximum bandwidth
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
@@ -83,20 +96,20 @@ void startAdv(void)
   // Secondary Scan Response packet (optional)
   // Since there is no room for 'Name' in Advertising packet
   Bluefruit.ScanResponse.addName();
-  
+
   /* Start Advertising
    * - Enable auto advertising if disconnected
    * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
    * - Timeout for fast mode is 30 seconds
    * - Start(timeout) with timeout = 0 will advertise forever (until connected)
-   * 
+   *
    * For recommended advertising interval
-   * https://developer.apple.com/library/content/qa/qa1931/_index.html   
+   * https://developer.apple.com/library/content/qa/qa1931/_index.html
    */
   Bluefruit.Advertising.restartOnDisconnect(true);
   Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
   Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
-  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
+  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
 void loop()
@@ -111,13 +124,22 @@ void loop()
     int count = Serial.readBytes(buf, sizeof(buf));
     bleuart.write( buf, count );
   }
-
+sensors_event_t gyro;
+float x, y, z;
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
+    
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
+    y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
+    z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
+    char *buf;
+    strcpy (buf, "Gyro: %f %f %f\n", x, y, z);
     uint8_t ch;
     ch = (uint8_t) bleuart.read();
     Serial.write(ch);
+    Serial.write(buf);
   }
 }
 
@@ -139,6 +161,7 @@ void connect_callback(uint16_t conn_handle)
  * @param conn_handle connection where this event happens
  * @param reason is a BLE_HCI_STATUS_CODE which can be found in ble_hci.h
  */
+ 
 void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 {
   (void) conn_handle;

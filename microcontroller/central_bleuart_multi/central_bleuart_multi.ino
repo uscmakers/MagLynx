@@ -19,20 +19,20 @@
  * One or more Bluefruit boards, configured as a peripheral with the
  * bleuart service running are required for this demo.
  *
- * This sketch will: 
+ * This sketch will:
  *  - Read data from the HW serial port (normally USB serial, accessible
  *    via the Serial Monitor for example), and send any incoming data to
  *    all other peripherals connected to the central device.
  *  - Forward any incoming bleuart messages from a peripheral to all of
  *    the other connected devices.
- * 
+ *
  * It is recommended to give each peripheral board a distinct name in order
  * to more easily distinguish the individual devices.
- * 
+ *
  * Connection Handle Explanation
  * -----------------------------
  * The total number of connections is BLE_MAX_CONNECTION (20)
- * 
+ *
  * The 'connection handle' is an integer number assigned by the SoftDevice
  * (Nordic's proprietary BLE stack). Each connection will receive it's own
  * numeric 'handle' starting from 0 to BLE_MAX_CONNECTION-1, depending on the order
@@ -64,13 +64,13 @@ typedef struct
 } prph_info_t;
 
 /* Peripheral info array (one per peripheral device)
- * 
+ *
  * There are 'BLE_MAX_CONNECTION' central connections, but the
  * the connection handle can be numerically larger (for example if
  * the peripheral role is also used, such as connecting to a mobile
  * device). As such, we need to convert connection handles <-> the array
  * index where appropriate to prevent out of array accesses.
- * 
+ *
  * Note: One can simply declares the array with BLE_MAX_CONNECTION and use connection
  * handle as index directly with the expense of SRAM.
  */
@@ -80,7 +80,7 @@ prph_info_t prphs[BLE_MAX_CONNECTION];
 SoftwareTimer blinkTimer;
 uint8_t connection_num = 0; // for blink pattern
 
-void setup() 
+void setup()
 {
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
@@ -91,20 +91,20 @@ void setup()
 
   Serial.println("Bluefruit52 Central Multi BLEUART Example");
   Serial.println("-----------------------------------------\n");
-  
+
   // Initialize Bluefruit with max concurrent connections as Peripheral = 0, Central = 4
   // SRAM usage required by SoftDevice will increase with number of connections
   Bluefruit.begin(0, 4);
 
   // Set Name
   Bluefruit.setName("Bluefruit52 Central");
-  
+
   // Init peripheral pool
   for (uint8_t idx=0; idx<BLE_MAX_CONNECTION; idx++)
   {
     // Invalid all connection handle
     prphs[idx].conn_handle = BLE_CONN_HANDLE_INVALID;
-    
+
     // All of BLE Central Uart Serivce
     prphs[idx].bleuart.begin();
     prphs[idx].bleuart.setRxCallback(bleuart_rx_callback);
@@ -136,7 +136,7 @@ void setup()
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
   // Since we configure the scanner with filterUuid()
-  // Scan callback only invoked for device with bleuart service advertised  
+  // Scan callback only invoked for device with bleuart service advertised
   // Connect to the device with bleuart service in advertising packet
   Bluefruit.Central.connect(report);
 }
@@ -152,10 +152,10 @@ void connect_callback(uint16_t conn_handle)
 
   // Eeek: Exceeded the number of connections !!!
   if ( id < 0 ) return;
-  
+
   prph_info_t* peer = &prphs[id];
   peer->conn_handle = conn_handle;
-  
+
   Bluefruit.Connection(conn_handle)->getPeerName(peer->name, sizeof(peer->name)-1);
 
   Serial.print("Connected to ");
@@ -179,7 +179,7 @@ void connect_callback(uint16_t conn_handle)
 
     // disconnect since we couldn't find bleuart service
     Bluefruit.disconnect(conn_handle);
-  }  
+  }
 
   connection_num++;
 }
@@ -211,7 +211,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 
 /**
  * Callback invoked when BLE UART data is received
- * @param uart_svc Reference object to the service where the data 
+ * @param uart_svc Reference object to the service where the data
  * arrived.
  */
 void bleuart_rx_callback(BLEClientUart& uart_svc)
@@ -221,7 +221,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
   int id = findConnHandle(conn_handle);
   prph_info_t* peer = &prphs[id];
-  
+
   // Print sender's name
   Serial.printf("[From %s]: ", peer->name);
 
@@ -230,7 +230,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   {
     // default MTU with an extra byte for string terminator
     char buf[20+1] = { 0 };
-    
+
     if ( uart_svc.read(buf,sizeof(buf)-1) )
     {
       Serial.println(buf);
@@ -246,7 +246,7 @@ void sendAll(const char* str)
 {
   Serial.print("[Send to All]: ");
   Serial.println(str);
-  
+
   for(uint8_t id=0; id < BLE_MAX_CONNECTION; id++)
   {
     prph_info_t* peer = &prphs[id];
@@ -264,8 +264,21 @@ void loop()
   if ( Bluefruit.Central.connected() )
   {
     // default MTU with an extra byte for string terminator
+    /*
+    sensors_event_t gyro;
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    float x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
+    float y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
+    float z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
+    data_buffer.push(x);
+    data_buffer2.push(y);
+    data_buffer3.push(z);
+    Serial.printf("Gyro: %f %f %f\n", x, y, z);
+    plotBuffer(arcada.getCanvas(), "Gyro (dps)",
+               data_buffer, data_buffer2, data_buffer3);
+    */
     char buf[20+1] = { 0 };
-    
+
     // Read from HW Serial (normally USB Serial) and send to all peripherals
     if ( Serial.readBytes(buf, sizeof(buf)-1) )
     {
@@ -289,7 +302,7 @@ int findConnHandle(uint16_t conn_handle)
     }
   }
 
-  return -1;  
+  return -1;
 }
 
 /**
@@ -297,14 +310,14 @@ int findConnHandle(uint16_t conn_handle)
  * minimal stack size. Therefore it should be as simple as possible. If
  * a periodically heavy task is needed, please use Scheduler.startLoop() to
  * create a dedicated task for it.
- * 
+ *
  * More information http://www.freertos.org/RTOS-software-timer.html
  */
 void blink_timer_callback(TimerHandle_t xTimerID)
 {
   (void) xTimerID;
 
-  // Period of sequence is 10 times (1 second). 
+  // Period of sequence is 10 times (1 second).
   // RED LED will toggle first 2*n times (on/off) and remain off for the rest of period
   // Where n = number of connection
   static uint8_t count = 0;
