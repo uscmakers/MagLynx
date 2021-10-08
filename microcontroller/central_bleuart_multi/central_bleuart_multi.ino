@@ -52,6 +52,11 @@
 
 #include <bluefruit.h>
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM6DS33.h>
+
+Adafruit_LSM6DS33 lsm6ds33;
+
 // Struct containing peripheral info
 typedef struct
 {
@@ -258,25 +263,16 @@ void sendAll(const char* str)
   }
 }
 
+sensors_event_t gyro;
+float x, y, z;
+
 void loop()
 {
   // First check if we are connected to any peripherals
   if ( Bluefruit.Central.connected() )
   {
     // default MTU with an extra byte for string terminator
-    /*
-    sensors_event_t gyro;
-    lsm6ds33.getEvent(NULL, &gyro, NULL);
-    float x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
-    float y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
-    float z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
-    data_buffer.push(x);
-    data_buffer2.push(y);
-    data_buffer3.push(z);
-    Serial.printf("Gyro: %f %f %f\n", x, y, z);
-    plotBuffer(arcada.getCanvas(), "Gyro (dps)",
-               data_buffer, data_buffer2, data_buffer3);
-    */
+
     char buf[20+1] = { 0 };
 
     // Read from HW Serial (normally USB Serial) and send to all peripherals
@@ -284,7 +280,25 @@ void loop()
     {
       sendAll(buf);
     }
+
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
+    y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
+    z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
+    // Storing float in char array for snprintf to work
+    char x_buf [sizeof(float)];
+    char y_buf [sizeof(float)];
+    char z_buf [sizeof(float)];
+    memcpy(x_buf,&x,sizeof(float));
+    memcpy(y_buf,&y,sizeof(float));
+    memcpy(z_buf,&z,sizeof(float));
+    char buff[64];
+    snprintf (buff, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
+    sendAll(buff);    
   }
+ 
+  // Forward from BLEUART to HW Serial
+ 
 }
 
 /**

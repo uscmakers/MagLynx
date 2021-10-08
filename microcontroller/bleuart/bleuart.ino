@@ -27,6 +27,9 @@ more testing
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <Adafruit_Sensor.h>
+#include <Adafruit_LSM6DS33.h>
+
+Adafruit_LSM6DS33 lsm6ds33;
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -134,8 +137,15 @@ float x, y, z;
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
     z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
-    char *buf;
-    strcpy (buf, "Gyro: %f %f %f\n", x, y, z);
+    // Storing float in char array for snprintf to work
+    char x_buf [sizeof(float)];
+    char y_buf [sizeof(float)];
+    char z_buf [sizeof(float)];
+    memcpy(x_buf,&x,sizeof(float));
+    memcpy(y_buf,&y,sizeof(float));
+    memcpy(z_buf,&z,sizeof(float));
+    char buf[64];
+    snprintf (buf, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
     uint8_t ch;
     ch = (uint8_t) bleuart.read();
     Serial.write(ch);
