@@ -1,17 +1,3 @@
-/*********************************************************************
- This is an example for our nRF52 based Bluefruit LE modules
-
- Pick one up today in the adafruit shop!
-
- Adafruit invests time and resources providing this open source code,
- please support Adafruit and open-source hardware by purchasing
- products from Adafruit!
-
- MIT license, check LICENSE for more information
- All text above, and the splash screen below must be included in
- any redistribution
-*********************************************************************/
-
 /* This sketch demonstrates the central API() that allows you to connect
  * to multiple peripherals boards (Bluefruit nRF52 in peripheral mode, or
  * any Bluefruit nRF51 boards).
@@ -52,10 +38,13 @@
 
 #include <bluefruit.h>
 
-#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Adafruit_LIS3MDL.h>
 #include <Adafruit_LSM6DS33.h>
+#include <Adafruit_Sensor.h>
 
 Adafruit_LSM6DS33 lsm6ds33;
+Adafruit_LIS3MDL lis3mdl;
 
 // Struct containing peripheral info
 typedef struct
@@ -66,6 +55,9 @@ typedef struct
 
   // Each prph need its own bleuart client service
   BLEClientUart bleuart;
+  float x;
+  float y;
+  float z;
 } prph_info_t;
 
 /* Peripheral info array (one per peripheral device)
@@ -177,7 +169,23 @@ void connect_callback(uint16_t conn_handle)
     Serial.println("Continue scanning for more peripherals");
     Bluefruit.Scanner.start(0);
 
-    Serial.println("Enter some text in the Serial Monitor to send it to all connected peripherals:");
+    peer->bleuart.print("initElectro()");
+    sensors_event_t gyro;
+    sensors_event_t mag;
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    lis3mdl.getEvent(&mag);
+    float x = gyro.gyro.x - mag.magnetic.x;
+    float y = gyro.gyro.y - mag.magnetic.y;
+    float z = gyro.gyro.z - mag.magnetic.z;
+    for (int i = 0; i < prphs.size(); i++) {
+      // This is assuming we've normalized the direction into xyz coordinates such as (1,1,1) or (0,1,0) rather than floats
+      if (x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {
+        // Tells the newly connected peripheral to determine its orientation compared to the old peripheral in the same direction
+        peer->bleuart.print("localElectro(): " + i);
+        prph_info_t* old = &prphs[i];
+        old->bleuart.print("initElectro()");
+      }
+    }
   } else
   {
     Serial.println("Found ... NOTHING!");
