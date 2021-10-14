@@ -115,12 +115,6 @@ void startAdv(void)
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
-// Called by central to turn on electromagnet for position calibration
-void initElectro()
-{
-  
-}
-
 void loop()
 {
   // Forward data from HW Serial to BLEUART

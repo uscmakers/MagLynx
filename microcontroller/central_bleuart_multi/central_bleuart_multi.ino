@@ -58,6 +58,7 @@ typedef struct
   float x;
   float y;
   float z;
+  float str;
 } prph_info_t;
 
 /* Peripheral info array (one per peripheral device)
@@ -174,16 +175,28 @@ void connect_callback(uint16_t conn_handle)
     sensors_event_t mag;
     lsm6ds33.getEvent(NULL, &gyro, NULL);
     lis3mdl.getEvent(&mag);
-    float x = gyro.gyro.x - mag.magnetic.x;
-    float y = gyro.gyro.y - mag.magnetic.y;
-    float z = gyro.gyro.z - mag.magnetic.z;
+    float x = mag.magnetic.x;
+    float y = mag.magnetic.y;
+    float z = mag.magnetic.z;
+    // Placeholder code for direction
+    // Need to convert form mag strength to xyz using https://digilent.com/blog/how-to-convert-magnetometer-data-into-compass-heading/
+    prphs[id].x = gyro.gyro.x - mag.magnetic.x;
+    prphs[id].y = gyro.gyro.y - mag.magnetic.y;
+    prphs[id].z = gyro.gyro.z - mag.magnetic.z;
+    prphs[id].str = x + y + z
     for (int i = 0; i < prphs.size(); i++) {
       // This is assuming we've normalized the direction into xyz coordinates such as (1,1,1) or (0,1,0) rather than floats
-      if (x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {
-        // Tells the newly connected peripheral to determine its orientation compared to the old peripheral in the same direction
-        peer->bleuart.print("localElectro(): " + i);
-        prph_info_t* old = &prphs[i];
-        old->bleuart.print("initElectro()");
+      if (id != i && x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {
+        // Assumes only 2 peripherals will be in the same direction initially
+        if (prphs[id].str < prphs[i].str) {
+          prphs[id].x *= 2;
+          prphs[id].y *= 2;
+          prphs[id].z *= 2;
+        } else {
+          prphs[i].x *= 2;
+          prphs[i].y *= 2;
+          prphs[i].z *= 2;
+        }
       }
     }
   } else
