@@ -183,10 +183,10 @@ void connect_callback(uint16_t conn_handle)
     prphs[id].x = gyro.gyro.x - mag.magnetic.x;
     prphs[id].y = gyro.gyro.y - mag.magnetic.y;
     prphs[id].z = gyro.gyro.z - mag.magnetic.z;
-    prphs[id].str = x + y + z
+    prphs[id].str = x + y + z;
     for (int i = 0; i < prphs.size(); i++) {
       // This is assuming we've normalized the direction into xyz coordinates such as (1,1,1) or (0,1,0) rather than floats
-      if (id != i && x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {
+      /*if (id != i && x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {
         // Assumes only 2 peripherals will be in the same direction initially
         if (prphs[id].str < prphs[i].str) {
           prphs[id].x *= 2;
@@ -197,7 +197,8 @@ void connect_callback(uint16_t conn_handle)
           prphs[i].y *= 2;
           prphs[i].z *= 2;
         }
-      }
+      }*/
+      Serial.println(prphs[i].str);
     }
   } else
   {
