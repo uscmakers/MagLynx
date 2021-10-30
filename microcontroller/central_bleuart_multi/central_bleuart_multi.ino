@@ -180,9 +180,9 @@ void connect_callback(uint16_t conn_handle)
     float z = mag.magnetic.z;
     // Placeholder code for direction
     // Need to convert form mag strength to xyz using https://digilent.com/blog/how-to-convert-magnetometer-data-into-compass-heading/
-    prphs[id].x = gyro.gyro.x - mag.magnetic.x;
-    prphs[id].y = gyro.gyro.y - mag.magnetic.y;
-    prphs[id].z = gyro.gyro.z - mag.magnetic.z;
+    prphs[id].x = mag.magnetic.x;
+    prphs[id].y = mag.magnetic.y;
+    prphs[id].z = mag.magnetic.z;
     prphs[id].str = x + y + z;
     for (int i = 0; i < sizeof(prphs); i++) {
       // This is assuming we've normalized the direction into xyz coordinates such as (1,1,1) or (0,1,0) rather than floats
@@ -316,11 +316,11 @@ void loop()
     memcpy(z_buf,&z,sizeof(float));
     char buff[64];
     snprintf (buff, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
-    sendAll(buff);    
+    sendAll(buff);
   }
- 
+
   // Forward from BLEUART to HW Serial
- 
+
 }
 
 /**
