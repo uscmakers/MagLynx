@@ -21,7 +21,7 @@ Testing - Anjali
 more testing
 *********************************************************************/
 
-
+#include <Servo.h>
 
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -39,6 +39,10 @@ BLEBas  blebas;  // battery
 
 void setup()
 {
+  Servo myservo;
+  myservo.attach(9); //attaches servo to pin 9
+  myservo.write(0);   // sets servo to position 0
+  
   Serial.begin(115200);
 
 #if CFG_DEBUG
@@ -125,14 +129,31 @@ void loop()
 
     uint8_t buf[64];
     int count = Serial.readBytes(buf, sizeof(buf));
+
+    //if peripheral senses magnetic field via magnetometer,
+    // rotate servo 180 degrees back and forth
+
+    if (buf.equals("servo")){
+      for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+        // in steps of 1 degree
+        myservo.write(pos);              // tell servo to go to position in variable 'pos'
+        delay(15);                       // waits 15 ms for the servo to reach the position
+      }
+      for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+        myservo.write(pos);              // tell servo to go to position in variable 'pos'
+        delay(15);                       // waits 15 ms for the servo to reach the position
+      }
+    }
+
     bleuart.write( buf, count );
+
   }
 sensors_event_t gyro;
 float x, y, z;
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
-    
+
     lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
@@ -151,6 +172,8 @@ float x, y, z;
     Serial.write(ch);
     Serial.write(buf);
   }
+
+
 }
 
 // callback invoked when central connects
@@ -171,7 +194,7 @@ void connect_callback(uint16_t conn_handle)
  * @param conn_handle connection where this event happens
  * @param reason is a BLE_HCI_STATUS_CODE which can be found in ble_hci.h
  */
- 
+
 void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 {
   (void) conn_handle;

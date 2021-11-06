@@ -38,6 +38,7 @@
 
 #include <bluefruit.h>
 
+#include <Servo.h>
 #include <Wire.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_LSM6DS33.h>
@@ -80,6 +81,10 @@ uint8_t connection_num = 0; // for blink pattern
 
 void setup()
 {
+  Servo myservo;
+  myservo.attach(9); //attaches servo to pin 9
+  myservo.write(0);   // sets servo to position 0
+
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
@@ -260,6 +265,20 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
     if ( uart_svc.read(buf,sizeof(buf)-1) )
     {
+      // if central clue senses magnetic field via magnetometer,
+      // rotate servo 180 degrees back and forth
+
+      if (buf.equals("servo")){
+        for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+          // in steps of 1 degree
+          myservo.write(pos);              // tell servo to go to position in variable 'pos'
+          delay(15);                       // waits 15 ms for the servo to reach the position
+        }
+        for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+          myservo.write(pos);              // tell servo to go to position in variable 'pos'
+          delay(15);                       // waits 15 ms for the servo to reach the position
+        }
+      }
       Serial.println(buf);
       sendAll(buf);
     }
@@ -316,11 +335,11 @@ void loop()
     memcpy(z_buf,&z,sizeof(float));
     char buff[64];
     snprintf (buff, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
-    sendAll(buff);    
+    sendAll(buff);
   }
- 
+
   // Forward from BLEUART to HW Serial
- 
+
 }
 
 /**
