@@ -37,7 +37,7 @@
  */
 
 #include <bluefruit.h>
-
+#include <math.h>
 #include <Servo.h>
 #include <Wire.h>
 #include <Adafruit_LIS3MDL.h>
@@ -60,6 +60,7 @@ typedef struct
   float y;
   float z;
   float str;
+  float theta;
 } prph_info_t;
 
 /* Peripheral info array (one per peripheral device)
@@ -185,10 +186,14 @@ void connect_callback(uint16_t conn_handle)
     float z = mag.magnetic.z;
     // Placeholder code for direction
     // Need to convert form mag strength to xyz using https://digilent.com/blog/how-to-convert-magnetometer-data-into-compass-heading/
+    // I think we may have disregarded the gyroscope values
+    // assuming we have absolute direction
+    absx, absy, absz = 0;
     prphs[id].x = mag.magnetic.x;
     prphs[id].y = mag.magnetic.y;
     prphs[id].z = mag.magnetic.z;
     prphs[id].str = x + y + z;
+    prphs[id].theta = atan2(x, y);
     for (int i = 0; i < sizeof(prphs); i++) {
       // This is assuming we've normalized the direction into xyz coordinates such as (1,1,1) or (0,1,0) rather than floats
       /*if (id != i && x == prphs[i].x && y == prphs[i].y && z == prphs[i].z) {

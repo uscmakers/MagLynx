@@ -1,0 +1,43 @@
+Class Comms (not a puck)
+    - Communicates with central through bluetooth
+    - converts movement commands to movements
+
+Class Puck
+    - This keeps track of the thetas of the pucks that are next to it
+    - Can also keep track of its own x and y
+    - Keep track of state of e-magnet
+
+    - Functionality
+
+        - move(float theta)
+            - called when it is the mover
+            - Moves servo to connect with moved Puck
+            - Moves servo to angle theta
+
+        - moved(float x, float y)
+            - called when it is moved
+            - updates the x, y position
+
+        - toggleElectroMagnet()
+            - it does what it says
+
+Class Central extends Puck
+    - Stores all x, y, and peripheral id
+    - Call localization function
+
+    - Functionality
+
+        - localization()
+            - finds relative position of peripherals
+            - finds relative angle
+
+        - moveTo(Puck mover, Puck moved)
+            - tells mover Puck to call move
+            - tells moved Puck to call moved
+
+
+Flow:
+    Human tells comms to move robot forward
+    comms tells central to move
+    central tells peripheral to move
+    peripheral moves
