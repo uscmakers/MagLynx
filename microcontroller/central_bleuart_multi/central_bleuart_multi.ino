@@ -43,9 +43,13 @@
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_LSM6DS33.h>
 #include <Adafruit_Sensor.h>
+#include <string>
 
 Adafruit_LSM6DS33 lsm6ds33;
 Adafruit_LIS3MDL lis3mdl;
+
+Servo myservo;
+int turn = 180;
 
 // Struct containing peripheral info
 typedef struct
@@ -82,9 +86,8 @@ uint8_t connection_num = 0; // for blink pattern
 
 void setup()
 {
-  Servo myservo;
   myservo.attach(9); //attaches servo to pin 9
-  myservo.write(0);   // sets servo to position 0
+  myservo.write(90);   // sets servo to position 0
 
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
@@ -176,19 +179,19 @@ void connect_callback(uint16_t conn_handle)
     Serial.println("Continue scanning for more peripherals");
     Bluefruit.Scanner.start(0);
 
-    peer->bleuart.print("initElectro()");
+    /*peer->bleuart.print("initElectro()");
     sensors_event_t gyro;
     sensors_event_t mag;
     lsm6ds33.getEvent(NULL, &gyro, NULL);
     lis3mdl.getEvent(&mag);
     float x = mag.magnetic.x;
     float y = mag.magnetic.y;
-    float z = mag.magnetic.z;
+    float z = mag.magnetic.z;*/
     // Placeholder code for direction
     // Need to convert form mag strength to xyz using https://digilent.com/blog/how-to-convert-magnetometer-data-into-compass-heading/
     // I think we may have disregarded the gyroscope values
     // assuming we have absolute direction
-    absx, absy, absz = 0;
+    /*absx, absy, absz = 0;
     prphs[id].x = mag.magnetic.x;
     prphs[id].y = mag.magnetic.y;
     prphs[id].z = mag.magnetic.z;
@@ -208,8 +211,7 @@ void connect_callback(uint16_t conn_handle)
           prphs[i].z *= 2;
         }
       }*/
-      Serial.println(prphs[i].str);
-    }
+      //Serial.println(prphs[i].str);
   } else
   {
     Serial.println("Found ... NOTHING!");
@@ -270,19 +272,25 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
     if ( uart_svc.read(buf,sizeof(buf)-1) )
     {
-      // if central clue senses magnetic field via magnetometer,
-      // rotate servo 180 degrees back and forth
+      // if central clue receives message from peripheral to go
+      // rotate servo set variable degrees back and forth
+      char char2[] = "servo";
 
-      if (buf.equals("servo")){
-        for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+      if (strcmp(buf, char2) == 0){
+        /*for (int pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
           // in steps of 1 degree
           myservo.write(pos);              // tell servo to go to position in variable 'pos'
           delay(15);                       // waits 15 ms for the servo to reach the position
         }
-        for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+
+
+        for (int pos = turn; pos >= 0; pos -= 1) { // goes from "turn" degrees to 0 degrees
           myservo.write(pos);              // tell servo to go to position in variable 'pos'
-          delay(15);                       // waits 15 ms for the servo to reach the position
+          delay(15);                      // waits 15 ms for the servo to reach the position
         }
+        */
+        myservo.write(0);
+        delay(1000);
       }
       Serial.println(buf);
       sendAll(buf);
@@ -327,7 +335,7 @@ void loop()
       sendAll(buf);
     }
 
-    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    /*lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
     z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
@@ -340,7 +348,7 @@ void loop()
     memcpy(z_buf,&z,sizeof(float));
     char buff[64];
     snprintf (buff, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
-    sendAll(buff);
+    sendAll(buff);*/
   }
 
   // Forward from BLEUART to HW Serial

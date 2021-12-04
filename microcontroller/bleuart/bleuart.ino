@@ -42,7 +42,8 @@ void setup()
   Servo myservo;
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(0);   // sets servo to position 0
-  
+  turn = 180;
+
   Serial.begin(115200);
 
 #if CFG_DEBUG
@@ -130,32 +131,33 @@ void loop()
     uint8_t buf[64];
     int count = Serial.readBytes(buf, sizeof(buf));
 
-    //if peripheral senses magnetic field via magnetometer,
-    // rotate servo 180 degrees back and forth
+
+    // rotate servo "turn" degrees back and forth
     unsigned char servo_string[64] = "servo";
 
     if (strcmp(buf, servo_string)==0){
-      for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+      for (pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
         // in steps of 1 degree
         myservo.write(pos);              // tell servo to go to position in variable 'pos'
         delay(15);                       // waits 15 ms for the servo to reach the position
       }
-      for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+      /*for (pos = turn; pos >= 0; pos -= 1) { // goes from "turn" degrees to 0 degrees
         myservo.write(pos);              // tell servo to go to position in variable 'pos'
         delay(15);                       // waits 15 ms for the servo to reach the position
       }
+      */
     }
 
     bleuart.write( buf, count );
 
   }
-sensors_event_t gyro;
-float x, y, z;
+  //sensors_event_t gyro;
+  //float x, y, z;
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
 
-    lsm6ds33.getEvent(NULL, &gyro, NULL);
+    /*lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
     z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
@@ -167,7 +169,7 @@ float x, y, z;
     memcpy(y_buf,&y,sizeof(float));
     memcpy(z_buf,&z,sizeof(float));
     char buf[64];
-    snprintf (buf, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
+    snprintf (buf, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));*/
     uint8_t ch;
     ch = (uint8_t) bleuart.read();
     Serial.write(ch);
