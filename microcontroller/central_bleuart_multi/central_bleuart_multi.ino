@@ -49,7 +49,7 @@ Adafruit_LSM6DS33 lsm6ds33;
 Adafruit_LIS3MDL lis3mdl;
 
 Servo myservo;
-int turn = 180;
+int flag = -1;
 
 // Struct containing peripheral info
 typedef struct
@@ -86,6 +86,8 @@ uint8_t connection_num = 0; // for blink pattern
 
 void setup()
 {
+  //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
+
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(90);   // sets servo to position 0
 
@@ -212,6 +214,8 @@ void connect_callback(uint16_t conn_handle)
         }
       }*/
       //Serial.println(prphs[i].str);
+      char message[2] = "1";
+      sendAll(message);
   } else
   {
     Serial.println("Found ... NOTHING!");
@@ -268,32 +272,38 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   while ( uart_svc.available() )
   {
     // default MTU with an extra byte for string terminator
-    char buf[20+1] = { 0 };
+    uint8_t s = 1;
+    uint8_t read = uart_svc.read();
+    char buf[6] = { 0 };
 
-    if ( uart_svc.read(buf,sizeof(buf)-1) )
-    {
+    if (read == s){
       // if central clue receives message from peripheral to go
       // rotate servo set variable degrees back and forth
-      char char2[] = "servo";
+      //char char2[6] = "servo";
 
-      if (strcmp(buf, char2) == 0){
         /*for (int pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
           // in steps of 1 degree
           myservo.write(pos);              // tell servo to go to position in variable 'pos'
           delay(15);                       // waits 15 ms for the servo to reach the position
         }
 
-
         for (int pos = turn; pos >= 0; pos -= 1) { // goes from "turn" degrees to 0 degrees
           myservo.write(pos);              // tell servo to go to position in variable 'pos'
           delay(15);                      // waits 15 ms for the servo to reach the position
         }
         */
-        myservo.write(0);
-        delay(1000);
-      }
-      Serial.println(buf);
-      sendAll(buf);
+
+        //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
+
+      myservo.write(90+flag*90); //turns servo at the fastest speed clockwise (ccw = 180)
+      //digitalToggle(LED_BUILTIN);
+      delay(2000); //need to test value of delay
+      myservo.write(90); //stops servo
+      //digitalWrite(LED_BUILTIN, LOW);
+      flag *= -1;
+      Serial.println(s);
+      char message[2] = "1";
+      sendAll(message);
     }
   }
 }

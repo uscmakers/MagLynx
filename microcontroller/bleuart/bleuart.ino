@@ -37,12 +37,15 @@ BLEDis  bledis;  // device information
 BLEUart bleuart; // uart over ble
 BLEBas  blebas;  // battery
 
+int flag = -1;
+
 void setup()
 {
+  //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
+
   Servo myservo;
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(0);   // sets servo to position 0
-  turn = 180;
 
   Serial.begin(115200);
 
@@ -122,39 +125,51 @@ void startAdv(void)
 
 void loop()
 {
+  while (Serial.available()){
+
+  }
   // Forward data from HW Serial to BLEUART
-  while (Serial.available())
+  while (bleuart.available())
   {
     // Delay to wait for enough input, since we have a limited transmission buffer
-    delay(2);
-
-    uint8_t buf[64];
-    int count = Serial.readBytes(buf, sizeof(buf));
-
 
     // rotate servo "turn" degrees back and forth
-    unsigned char servo_string[64] = "servo";
+    //bleuart only reads int :(
+    uint8_t s = 1;
+    uint8_t read = bleuart.read();
+    char buf[6] = "servo";
 
-    if (strcmp(buf, servo_string)==0){
-      for (pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
+    if (read == 49){
+      /*for (pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
         // in steps of 1 degree
         myservo.write(pos);              // tell servo to go to position in variable 'pos'
         delay(15);                       // waits 15 ms for the servo to reach the position
       }
+      */
+
       /*for (pos = turn; pos >= 0; pos -= 1) { // goes from "turn" degrees to 0 degrees
         myservo.write(pos);              // tell servo to go to position in variable 'pos'
         delay(15);                       // waits 15 ms for the servo to reach the position
       }
       */
-    }
 
-    bleuart.write( buf, count );
+      //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
+
+      myservo.write(90+flag*90); //turns servo at the fastest speed clockwise (ccw = 180)
+      //digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
+      delay(2000);
+      myservo.write(90); //stops servo
+      //digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
+      flag *= -1; //need to test value of delay
+      bleuart.write(s);
+      Serial.println(s);
+    }
 
   }
   //sensors_event_t gyro;
   //float x, y, z;
   // Forward from BLEUART to HW Serial
-  while ( bleuart.available() )
+  //while ( bleuart.available() )
   {
 
     /*lsm6ds33.getEvent(NULL, &gyro, NULL);
@@ -170,11 +185,13 @@ void loop()
     memcpy(z_buf,&z,sizeof(float));
     char buf[64];
     snprintf (buf, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));*/
-    uint8_t ch;
+    /*uint8_t ch;
     ch = (uint8_t) bleuart.read();
     Serial.write(ch);
-    Serial.write(buf);
+    //Serial.write(buf);
+    */
   }
+
 
 
 }
