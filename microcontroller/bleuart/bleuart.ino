@@ -113,9 +113,11 @@ void loop()
   {
     
     // rotate servo "turn" degrees back and forth
-    //bleuart only reads int :(
     uint8_t s = 1;
-    uint8_t read = bleuart.read();
+    char buf[2] = { 0 };
+    // bleuart.read() returns number of characters read
+    // With no parameters, it returns the character itself
+    uint8_t read = bleuart.read(buf, 1);
     //char buf[6] = "servo";
 
     if (read > 0 && num > 0)
