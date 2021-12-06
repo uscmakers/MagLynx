@@ -12,6 +12,7 @@
 
 Servo myservo;
 int flag = -1;
+volatile int rand = 0;
 
 // Struct containing peripheral info
 typedef struct
@@ -295,6 +296,10 @@ void sendAll(const char* str)
 
 void loop()
 {
+  if (rand > 0)
+  {
+    rand = -1;
+  }
   // First check if we are connected to any peripherals
   if ( Bluefruit.Central.connected() )
   {
