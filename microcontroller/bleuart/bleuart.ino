@@ -37,25 +37,26 @@ BLEDis  bledis;  // device information
 BLEUart bleuart; // uart over ble
 BLEBas  blebas;  // battery
 
+Servo myservo;
 int flag = -1;
 
 void setup()
 {
   //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
 
-  Servo myservo;
+
   myservo.attach(9); //attaches servo to pin 9
-  myservo.write(0);   // sets servo to position 0
+  myservo.write(95);   // sets servo to position 0
 
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
-#if CFG_DEBUG
+//#if CFG_DEBUG
   // Blocking wait for connection when debug mode is enabled via IDE
-  while ( !Serial ) yield();
-#endif
+  //while ( !Serial ) yield();
+//#endif
 
-  Serial.println("Bluefruit52 BLEUART Example");
-  Serial.println("---------------------------\n");
+  //Serial.println("Bluefruit52 BLEUART Example");
+  //Serial.println("---------------------------\n");
 
   // Setup the BLE LED to be enabled on CONNECT
   // Note: This is actually the default behavior, but provided
@@ -91,8 +92,8 @@ void setup()
   // Set up and start advertising
   startAdv();
 
-  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
-  Serial.println("Once connected, enter character(s) that you wish to send");
+  //Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
+  //Serial.println("Once connected, enter character(s) that you wish to send");
 }
 
 void startAdv(void)
@@ -125,9 +126,9 @@ void startAdv(void)
 
 void loop()
 {
-  while (Serial.available()){
+  //while (Serial.available()){
 
-  }
+  //}
   // Forward data from HW Serial to BLEUART
   while (bleuart.available())
   {
@@ -158,11 +159,11 @@ void loop()
       myservo.write(90+flag*90); //turns servo at the fastest speed clockwise (ccw = 180)
       //digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
       delay(2000);
-      myservo.write(90); //stops servo
+      myservo.write(95); //stops servo
       //digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
       flag *= -1; //need to test value of delay
       bleuart.write(s);
-      Serial.println(s);
+      //Serial.println(s);
     }
 
   }
@@ -205,8 +206,8 @@ void connect_callback(uint16_t conn_handle)
   char central_name[32] = { 0 };
   connection->getPeerName(central_name, sizeof(central_name));
 
-  Serial.print("Connected to ");
-  Serial.println(central_name);
+  //Serial.print("Connected to ");
+  //Serial.println(central_name);
 }
 
 /**
@@ -220,6 +221,6 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
   (void) conn_handle;
   (void) reason;
 
-  Serial.println();
-  Serial.print("Disconnected, reason = 0x"); Serial.println(reason, HEX);
+  //Serial.println();
+  //Serial.print("Disconnected, reason = 0x"); Serial.println(reason, HEX);
 }

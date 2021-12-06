@@ -89,17 +89,17 @@ void setup()
   //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
 
   myservo.attach(9); //attaches servo to pin 9
-  myservo.write(90);   // sets servo to position 0
+  myservo.write(95);   // sets servo to position 0
 
-  Serial.begin(115200);
-  while ( !Serial ) delay(10);   // for nrf52840 with native usb
+  //Serial.begin(115200);
+  //while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
   // Initialize blinkTimer for 100 ms and start it
   blinkTimer.begin(100, blink_timer_callback);
   blinkTimer.start();
 
-  Serial.println("Bluefruit52 Central Multi BLEUART Example");
-  Serial.println("-----------------------------------------\n");
+  //Serial.println("Bluefruit52 Central Multi BLEUART Example");
+  //Serial.println("-----------------------------------------\n");
 
   // Initialize Bluefruit with max concurrent connections as Peripheral = 0, Central = 4
   // SRAM usage required by SoftDevice will increase with number of connections
@@ -167,18 +167,18 @@ void connect_callback(uint16_t conn_handle)
 
   Bluefruit.Connection(conn_handle)->getPeerName(peer->name, sizeof(peer->name)-1);
 
-  Serial.print("Connected to ");
-  Serial.println(peer->name);
+  //Serial.print("Connected to ");
+  //Serial.println(peer->name);
 
-  Serial.print("Discovering BLE UART service ... ");
+  //Serial.print("Discovering BLE UART service ... ");
 
   if ( peer->bleuart.discover(conn_handle) )
   {
-    Serial.println("Found it");
-    Serial.println("Enabling TXD characteristic's CCCD notify bit");
+    //Serial.println("Found it");
+    //Serial.println("Enabling TXD characteristic's CCCD notify bit");
     peer->bleuart.enableTXD();
 
-    Serial.println("Continue scanning for more peripherals");
+    //Serial.println("Continue scanning for more peripherals");
     Bluefruit.Scanner.start(0);
 
     /*peer->bleuart.print("initElectro()");
@@ -218,7 +218,7 @@ void connect_callback(uint16_t conn_handle)
       sendAll(message);
   } else
   {
-    Serial.println("Found ... NOTHING!");
+    //Serial.println("Found ... NOTHING!");
 
     // disconnect since we couldn't find bleuart service
     Bluefruit.disconnect(conn_handle);
@@ -248,8 +248,8 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
   // Mark conn handle as invalid
   prphs[id].conn_handle = BLE_CONN_HANDLE_INVALID;
 
-  Serial.print(prphs[id].name);
-  Serial.println(" disconnected!");
+  //Serial.print(prphs[id].name);
+  //Serial.println(" disconnected!");
 }
 
 /**
@@ -266,7 +266,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   prph_info_t* peer = &prphs[id];
 
   // Print sender's name
-  Serial.printf("[From %s]: ", peer->name);
+  //Serial.printf("[From %s]: ", peer->name);
 
   // Read then forward to all peripherals
   while ( uart_svc.available() )
@@ -295,13 +295,13 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
         //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
-      myservo.write(90+flag*90); //turns servo at the fastest speed clockwise (ccw = 180)
+      myservo.write(90+flag*90);  //turns servo at the fastest speed clockwise (ccw = 180)
       //digitalToggle(LED_BUILTIN);
-      delay(2000); //need to test value of delay
-      myservo.write(90); //stops servo
+      delay(2000);                //need to test value of delay
+      myservo.write(95);          //stops servo
       //digitalWrite(LED_BUILTIN, LOW);
       flag *= -1;
-      Serial.println(s);
+      //Serial.println(s);
       char message[2] = "1";
       sendAll(message);
     }
@@ -313,8 +313,8 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
  */
 void sendAll(const char* str)
 {
-  Serial.print("[Send to All]: ");
-  Serial.println(str);
+  //Serial.print("[Send to All]: ");
+  //Serial.println(str);
 
   for(uint8_t id=0; id < BLE_MAX_CONNECTION; id++)
   {
@@ -340,10 +340,10 @@ void loop()
     char buf[20+1] = { 0 };
 
     // Read from HW Serial (normally USB Serial) and send to all peripherals
-    if ( Serial.readBytes(buf, sizeof(buf)-1) )
-    {
-      sendAll(buf);
-    }
+    //if ( Serial.readBytes(buf, sizeof(buf)-1) )
+    //{
+      //sendAll(buf);
+    //}
 
     /*lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
