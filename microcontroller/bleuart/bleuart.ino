@@ -15,6 +15,7 @@ BLEBas  blebas;  // battery
 
 Servo myservo;
 int flag = -1;
+int num = 2;
 
 void setup()
 {
@@ -117,7 +118,7 @@ void loop()
     uint8_t read = bleuart.read();
     //char buf[6] = "servo";
 
-    if (read == 49)
+    if (read > 0 && num > 0)
     {
       /*for (pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
         // in steps of 1 degree
@@ -140,6 +141,7 @@ void loop()
       myservo.write(95); //stops servo
       digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
       flag *= -1; //need to test value of delay
+      //num--;
       bleuart.write(s);
       //Serial.println(s);
     }

@@ -13,6 +13,7 @@
 Servo myservo;
 int flag = -1;
 volatile int rand = 0;
+int num = 2;
 
 // Struct containing peripheral info
 typedef struct
@@ -23,11 +24,11 @@ typedef struct
 
   // Each prph need its own bleuart client service
   BLEClientUart bleuart;
-  float x;
+  /*float x;
   float y;
   float z;
   float str;
-  float theta;
+  float theta;*/
 } prph_info_t;
 
 /* Peripheral info array (one per peripheral device)
@@ -240,7 +241,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
     uint8_t read = uart_svc.read();
     //char buf[6] = { 0 };
 
-    if (read == s){
+    if (read > 0 && num > 0){
       // if central clue receives message from peripheral to go
       // rotate servo set variable degrees back and forth
       //char char2[6] = "servo";
@@ -265,6 +266,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
       myservo.write(95);          //stops servo
       digitalWrite(LED_BUILTIN, LOW);
       flag *= -1;
+      //num--;
       //Serial.println(s);
       char message[2] = "1";
       sendAll(message);
@@ -296,13 +298,13 @@ void sendAll(const char* str)
 
 void loop()
 {
-  if (rand > 0)
-  {
-    rand = -1;
-  }
   // First check if we are connected to any peripherals
   if ( Bluefruit.Central.connected() )
   {
+    if (rand > 0)
+    {
+      rand = -1;
+    }
     // default MTU with an extra byte for string terminator
 
     /*char buf[20+1] = { 0 };
