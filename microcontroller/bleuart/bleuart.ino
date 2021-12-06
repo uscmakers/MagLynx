@@ -1,35 +1,11 @@
-/*********************************************************************
- This is an example for our nRF52 based Bluefruit LE modules
-
- Pick one up today in the adafruit shop!
-
- Adafruit invests time and resources providing this open source code,
- please support Adafruit and open-source hardware by purchasing
- products from Adafruit!
-
- MIT license, check LICENSE for more information
- All text above, and the splash screen below must be included in
- any redistribution
-*********************************************************************/
-
-/*********************************************************************
-hi guys! <3 Emma
-this is so neat
-Hi!
-Testing - Anjali
-
-more testing
-*********************************************************************/
-
 #include <Servo.h>
-
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM6DS33.h>
 
-Adafruit_LSM6DS33 lsm6ds33;
+//Adafruit_LSM6DS33 lsm6ds33;
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -42,8 +18,7 @@ int flag = -1;
 
 void setup()
 {
-  //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
-
+  //pinMode(LED_BUILTIN, OUTPUT);
 
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(95);   // sets servo to position 0
@@ -126,21 +101,24 @@ void startAdv(void)
 
 void loop()
 {
-  //while (Serial.available()){
-
-  //}
   // Forward data from HW Serial to BLEUART
-  while (bleuart.available())
+  /*while (Serial.available())
   {
     // Delay to wait for enough input, since we have a limited transmission buffer
-
+    delay(2);
+  }*/
+  
+  while (bleuart.available())
+  {
+    
     // rotate servo "turn" degrees back and forth
     //bleuart only reads int :(
     uint8_t s = 1;
     uint8_t read = bleuart.read();
-    char buf[6] = "servo";
+    //char buf[6] = "servo";
 
-    if (read == 49){
+    if (read == 49)
+    {
       /*for (pos = 0; pos <= turn; pos += 1) { // goes from 0 degrees to "turn" degrees
         // in steps of 1 degree
         myservo.write(pos);              // tell servo to go to position in variable 'pos'
@@ -165,15 +143,12 @@ void loop()
       bleuart.write(s);
       Serial.println(s);
     }
-
   }
-  //sensors_event_t gyro;
-  //float x, y, z;
-  // Forward from BLEUART to HW Serial
-  //while ( bleuart.available() )
+  /*sensors_event_t gyro;
+  float x, y, z;
+  while ( bleuart.available() )
   {
-
-    /*lsm6ds33.getEvent(NULL, &gyro, NULL);
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
     z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
@@ -190,11 +165,7 @@ void loop()
     ch = (uint8_t) bleuart.read();
     Serial.write(ch);
     //Serial.write(buf);
-    */
-  }
-
-
-
+  }*/
 }
 
 // callback invoked when central connects

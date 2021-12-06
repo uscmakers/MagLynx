@@ -1,41 +1,3 @@
-/* This sketch demonstrates the central API() that allows you to connect
- * to multiple peripherals boards (Bluefruit nRF52 in peripheral mode, or
- * any Bluefruit nRF51 boards).
- *
- * One or more Bluefruit boards, configured as a peripheral with the
- * bleuart service running are required for this demo.
- *
- * This sketch will:
- *  - Read data from the HW serial port (normally USB serial, accessible
- *    via the Serial Monitor for example), and send any incoming data to
- *    all other peripherals connected to the central device.
- *  - Forward any incoming bleuart messages from a peripheral to all of
- *    the other connected devices.
- *
- * It is recommended to give each peripheral board a distinct name in order
- * to more easily distinguish the individual devices.
- *
- * Connection Handle Explanation
- * -----------------------------
- * The total number of connections is BLE_MAX_CONNECTION (20)
- *
- * The 'connection handle' is an integer number assigned by the SoftDevice
- * (Nordic's proprietary BLE stack). Each connection will receive it's own
- * numeric 'handle' starting from 0 to BLE_MAX_CONNECTION-1, depending on the order
- * of connection(s).
- *
- * - E.g If our Central board connects to a mobile phone first (running as a peripheral),
- * then afterwards connects to another Bluefruit board running in peripheral mode, then
- * the connection handle of mobile phone is 0, and the handle for the Bluefruit
- * board is 1, and so on.
- */
-
-/* LED PATTERNS
- * ------------
- * LED_RED   - Blinks pattern changes based on the number of connections.
- * LED_BLUE  - Blinks constantly when scanning
- */
-
 #include <bluefruit.h>
 #include <math.h>
 #include <Servo.h>
@@ -45,8 +7,8 @@
 #include <Adafruit_Sensor.h>
 #include <string>
 
-Adafruit_LSM6DS33 lsm6ds33;
-Adafruit_LIS3MDL lis3mdl;
+//Adafruit_LSM6DS33 lsm6ds33;
+//Adafruit_LIS3MDL lis3mdl;
 
 Servo myservo;
 int flag = -1;
@@ -81,7 +43,7 @@ typedef struct
 prph_info_t prphs[BLE_MAX_CONNECTION];
 
 // Software Timer for blinking the RED LED
-SoftwareTimer blinkTimer;
+//SoftwareTimer blinkTimer;
 uint8_t connection_num = 0; // for blink pattern
 
 void setup()
@@ -95,8 +57,8 @@ void setup()
   //while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
   // Initialize blinkTimer for 100 ms and start it
-  blinkTimer.begin(100, blink_timer_callback);
-  blinkTimer.start();
+  //blinkTimer.begin(100, blink_timer_callback);
+  //blinkTimer.start();
 
   //Serial.println("Bluefruit52 Central Multi BLEUART Example");
   //Serial.println("-----------------------------------------\n");
@@ -212,10 +174,11 @@ void connect_callback(uint16_t conn_handle)
           prphs[i].y *= 2;
           prphs[i].z *= 2;
         }
-      }*/
-      //Serial.println(prphs[i].str);
-      char message[2] = "1";
-      sendAll(message);
+      }
+    }*/
+    //Serial.println(prphs[i].str);
+    char message[2] = "1";
+    sendAll(message);
   } else
   {
     //Serial.println("Found ... NOTHING!");
@@ -274,7 +237,7 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
     // default MTU with an extra byte for string terminator
     uint8_t s = 1;
     uint8_t read = uart_svc.read();
-    char buf[6] = { 0 };
+    //char buf[6] = { 0 };
 
     if (read == s){
       // if central clue receives message from peripheral to go
@@ -327,8 +290,8 @@ void sendAll(const char* str)
   }
 }
 
-sensors_event_t gyro;
-float x, y, z;
+//sensors_event_t gyro;
+//float x, y, z;
 
 void loop()
 {
@@ -337,7 +300,7 @@ void loop()
   {
     // default MTU with an extra byte for string terminator
 
-    char buf[20+1] = { 0 };
+    /*char buf[20+1] = { 0 };
 
     // Read from HW Serial (normally USB Serial) and send to all peripherals
     //if ( Serial.readBytes(buf, sizeof(buf)-1) )
@@ -345,7 +308,7 @@ void loop()
       //sendAll(buf);
     //}
 
-    /*lsm6ds33.getEvent(NULL, &gyro, NULL);
+    lsm6ds33.getEvent(NULL, &gyro, NULL);
     x = gyro.gyro.x * SENSORS_RADS_TO_DPS;
     y = gyro.gyro.y * SENSORS_RADS_TO_DPS;
     z = gyro.gyro.z * SENSORS_RADS_TO_DPS;
@@ -360,9 +323,6 @@ void loop()
     snprintf (buff, 64, ("Gyro: %g %g %g\n", x_buf, y_buf, z_buf));
     sendAll(buff);*/
   }
-
-  // Forward from BLEUART to HW Serial
-
 }
 
 /**
