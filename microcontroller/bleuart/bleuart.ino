@@ -18,12 +18,12 @@ int flag = -1;
 
 void setup()
 {
-  //pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(95);   // sets servo to position 0
 
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
 //#if CFG_DEBUG
   // Blocking wait for connection when debug mode is enabled via IDE
@@ -135,13 +135,13 @@ void loop()
       //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
       myservo.write(95+flag*45); //turns servo at the fastest speed clockwise (ccw = 180)
-      //digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
+      digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
       delay(920);
       myservo.write(95); //stops servo
-      //digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
+      digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
       flag *= -1; //need to test value of delay
       bleuart.write(s);
-      Serial.println(s);
+      //Serial.println(s);
     }
   }
   /*sensors_event_t gyro;

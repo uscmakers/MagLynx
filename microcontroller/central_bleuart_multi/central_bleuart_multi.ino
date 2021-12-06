@@ -48,7 +48,7 @@ uint8_t connection_num = 0; // for blink pattern
 
 void setup()
 {
-  //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
+  pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
 
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(95);   // sets servo to position 0
@@ -259,10 +259,10 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
         //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
       myservo.write(95+flag*45);  //turns servo at the fastest speed clockwise (ccw = 180)
-      //digitalToggle(LED_BUILTIN);
+      digitalToggle(LED_BUILTIN);
       delay(920);                //need to test value of delay
       myservo.write(95);          //stops servo
-      //digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(LED_BUILTIN, LOW);
       flag *= -1;
       //Serial.println(s);
       char message[2] = "1";
