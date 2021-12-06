@@ -295,9 +295,9 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
         //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
-      myservo.write(90+flag*90);  //turns servo at the fastest speed clockwise (ccw = 180)
+      myservo.write(95+flag*45);  //turns servo at the fastest speed clockwise (ccw = 180)
       //digitalToggle(LED_BUILTIN);
-      delay(2000);                //need to test value of delay
+      delay(920);                //need to test value of delay
       myservo.write(95);          //stops servo
       //digitalWrite(LED_BUILTIN, LOW);
       flag *= -1;
