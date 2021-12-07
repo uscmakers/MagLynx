@@ -19,7 +19,7 @@ int num = 2;
 
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT);
+  //pinMode(LED_BUILTIN, OUTPUT);
 
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(95);   // sets servo to position 0
@@ -108,10 +108,10 @@ void loop()
     // Delay to wait for enough input, since we have a limited transmission buffer
     delay(2);
   }*/
-  
+
   while (bleuart.available())
   {
-    
+
     // rotate servo "turn" degrees back and forth
     uint8_t s = 1;
     char buf[2] = { 0 };
@@ -138,12 +138,12 @@ void loop()
       //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
       myservo.write(95+flag*45); //turns servo at the fastest speed clockwise (ccw = 180)
-      digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
-      delay(920);
+      //digitalToggle(LED_BUILTIN); //COMMENT OUT LATER
+      delay(900);
       myservo.write(95); //stops servo
-      digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
+      //digitalWrite(LED_BUILTIN, LOW); //COMMENT OUT LATER
       flag *= -1; //need to test value of delay
-      //num--;
+      num--;
       bleuart.write(s);
       //Serial.println(s);
     }

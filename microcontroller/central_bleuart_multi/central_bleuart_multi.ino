@@ -12,7 +12,7 @@
 
 Servo myservo;
 int flag = -1;
-volatile int rand = 0;
+volatile int vol = 0;
 int num = 2;
 
 // Struct containing peripheral info
@@ -50,7 +50,7 @@ uint8_t connection_num = 0; // for blink pattern
 
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
+  //pinMode(LED_BUILTIN, OUTPUT); //COMMENT OUT LATER
 
   myservo.attach(9); //attaches servo to pin 9
   myservo.write(95);   // sets servo to position 0
@@ -179,6 +179,7 @@ void connect_callback(uint16_t conn_handle)
       }
     }*/
     //Serial.println(prphs[i].str);
+    delay(2000);
     char message[2] = "1";
     sendAll(message);
   } else
@@ -260,13 +261,13 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 
         //when flag = -1 servo turns counter clockwise, when flag = 1 servo turns clockwise
 
-      myservo.write(95+flag*45);  //turns servo at the fastest speed clockwise (ccw = 180)
-      digitalToggle(LED_BUILTIN);
-      delay(920);                //need to test value of delay
-      myservo.write(95);          //stops servo
-      digitalWrite(LED_BUILTIN, LOW);
+      //myservo.write(95+flag*45);  //turns servo at the fastest speed clockwise (ccw = 180)
+      //digitalToggle(LED_BUILTIN);
+      delay(600);                //need to test value of delay
+      //myservo.write(95);          //stops servo
+      //digitalWrite(LED_BUILTIN, LOW);
       flag *= -1;
-      //num--;
+      num--;
       //Serial.println(s);
       char message[2] = "1";
       sendAll(message);
@@ -301,9 +302,9 @@ void loop()
   // First check if we are connected to any peripherals
   if ( Bluefruit.Central.connected() )
   {
-    if (rand > 0)
+    if (vol > 0)
     {
-      rand = -1;
+      vol = -1;
     }
     // default MTU with an extra byte for string terminator
 
