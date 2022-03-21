@@ -58,28 +58,28 @@ void rxCallback(uint8_t *buffer, uint8_t len)
     switch ((char)buffer[1]) {
     case 'Q':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Quaternion Data:");
-      printQuaternionData(buffer);
+      //Serial.println("Quaternion Data:");
+      //printQuaternionData(buffer);
       break;
     case 'A':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Accelerometer Data:");
-      printSensorDataXYZ(buffer);
+      //Serial.println("Accelerometer Data:");
+      //printSensorDataXYZ(buffer);
       break; 
     case 'G':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Gyro Data:");
-      printSensorDataXYZ(buffer);
+      //Serial.println("Gyro Data:");
+      //printSensorDataXYZ(buffer);
       break;
     case 'M':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Magnetometer Data:");
-      printSensorDataXYZ(buffer);
+      //Serial.println("Magnetometer Data:");
+      //printSensorDataXYZ(buffer);
       break;
     case 'L':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Location Data:");
-      printLocationData(buffer);
+      //Serial.println("Location Data:");
+      //printLocationData(buffer);
       break;
     case 'B':
       if (checkCRC(buffer) == false) { break; }
@@ -90,8 +90,8 @@ void rxCallback(uint8_t *buffer, uint8_t len)
       break;
     case 'C':
       if (checkCRC(buffer) == false) { break; }
-      Serial.println("Color ");
-      printColorData(buffer);
+      //Serial.println("Color ");
+      //printColorData(buffer);
       break;
     default:
       Serial.println("Unknown Data Type");
