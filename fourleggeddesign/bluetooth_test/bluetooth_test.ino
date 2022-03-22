@@ -1,7 +1,6 @@
 // BLE Controller Test
 // Example of parsing Controller/Sensor data received from Bluefruit LE Connect app
-// Requires Bluefruit LE hardware & Adafruit_BLE_UART library from Adafruit nRF8001
-//
+// Requires Bluefruit LE hardware & Adafruit_BLE_UART from Adafruit nRF8001 library
 
 #include <SPI.h>
 #include "Adafruit_BLE_UART.h"
@@ -84,7 +83,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
     case 'B':
       if (checkCRC(buffer) == false) { break; }
       Serial.print("Button ");
-      Serial.print((char)buffer[2]);
+      Serial.print((char)buffer[2]); // 1:1 2:2 3:3 4:4 5:Up 6:Down 7:Left 8:Right
       Serial.print(" ");
       printButtonState((char)buffer[3]);
       break;
@@ -99,7 +98,6 @@ void rxCallback(uint8_t *buffer, uint8_t len)
     }
     Serial.println("");
   }
-
   /* Echo the same data back! */
   //  uart.write(buffer, len);
 }
@@ -126,14 +124,10 @@ void setup(void)
 /**************************************************************************/
 void loop()
 {
-
   uart.pollACI();
-
 }
 
-
 void printSensorDataXYZ(uint8_t *buffer) {
-
   float x = *( (float*)(buffer + 2) );
   Serial.print("x = ");
   Serial.println(x, 7);
@@ -145,12 +139,9 @@ void printSensorDataXYZ(uint8_t *buffer) {
   float z = *( (float*)(buffer + 10) );
   Serial.print("z = ");
   Serial.println(z, 7); 
-
 }
 
-
 void printLocationData(uint8_t *buffer) {
-
   float x = *( (float*)(buffer + 2) );
   Serial.print("lat = ");
   Serial.println(x, 7);
@@ -162,12 +153,9 @@ void printLocationData(uint8_t *buffer) {
   float z = *( (float*)(buffer + 10) );
   Serial.print("alt = ");
   Serial.println(z, 7); 
-
 }
 
-
 void printColorData(uint8_t *buffer) {
-
   byte r = *(buffer + 2);
   Serial.print("r = ");
   Serial.println(r, DEC);
@@ -179,12 +167,9 @@ void printColorData(uint8_t *buffer) {
   byte b = *(buffer + 4);
   Serial.print("b = ");
   Serial.println(b, DEC); 
-
 }
 
-
 void printQuaternionData(uint8_t *buffer) {
-
   float x = *( (float*)(buffer + 2) );
   Serial.print("x = ");
   Serial.println(x, 7);
@@ -200,20 +185,15 @@ void printQuaternionData(uint8_t *buffer) {
   float w = *( (float*)(buffer + 14) );
   Serial.print("w = ");
   Serial.println(w, 7); 
-
 }
 
-
 boolean checkCRC(uint8_t *buffer) {
-
   uint8_t len = sizeof(buffer);
   uint8_t crc = buffer[len-2];
   uint8_t sum = 0;
 
   for (int i = 0; i < (len-1); i++) {
-
     sum += buffer[i];
-
   }
 
   Serial.print("CRC ");
@@ -222,17 +202,13 @@ boolean checkCRC(uint8_t *buffer) {
     Serial.println("PASS");
     return true;
   }
-
   else {
     Serial.println("FAIL");
     return false;
   }
-
 }
 
-
 void printButtonState(char buttonState) {
-
   if (buttonState == '0') {
     Serial.println("released");
   }
