@@ -48,6 +48,7 @@ void loop() {
   // enum legs leg = fr;
 
   if(direction == 1){   // forward
+    
   }
   else if(direction == -1){   // backward
 
