@@ -3,13 +3,13 @@
 // Requires Bluefruit LE hardware & Adafruit_BLE_UART from Adafruit nRF8001 library
 
 #include <SPI.h>
-#include "Adafruit_BLE_UART.h"
+#include "bluefruit.h"
 
 #define ADAFRUITBLE_REQ 10
 #define ADAFRUITBLE_RST 9
 #define ADAFRUITBLE_RDY 2
 
-Adafruit_BLE_UART uart = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
+BLEUart uart = BLEUart(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
 
 unsigned long time = 0l;
 boolean connection = false;
@@ -64,7 +64,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
       if (checkCRC(buffer) == false) { break; }
       //Serial.println("Accelerometer Data:");
       //printSensorDataXYZ(buffer);
-      break; 
+      break;
     case 'G':
       if (checkCRC(buffer) == false) { break; }
       //Serial.println("Gyro Data:");
@@ -108,7 +108,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
  */
 /**************************************************************************/
 void setup(void)
-{ 
+{
   Serial.begin(9600);
   Serial.println(F("Arduino setup"));
 
@@ -138,7 +138,7 @@ void printSensorDataXYZ(uint8_t *buffer) {
 
   float z = *( (float*)(buffer + 10) );
   Serial.print("z = ");
-  Serial.println(z, 7); 
+  Serial.println(z, 7);
 }
 
 void printLocationData(uint8_t *buffer) {
@@ -152,7 +152,7 @@ void printLocationData(uint8_t *buffer) {
 
   float z = *( (float*)(buffer + 10) );
   Serial.print("alt = ");
-  Serial.println(z, 7); 
+  Serial.println(z, 7);
 }
 
 void printColorData(uint8_t *buffer) {
@@ -166,7 +166,7 @@ void printColorData(uint8_t *buffer) {
 
   byte b = *(buffer + 4);
   Serial.print("b = ");
-  Serial.println(b, DEC); 
+  Serial.println(b, DEC);
 }
 
 void printQuaternionData(uint8_t *buffer) {
@@ -180,11 +180,11 @@ void printQuaternionData(uint8_t *buffer) {
 
   float z = *( (float*)(buffer + 10) );
   Serial.print("z = ");
-  Serial.println(z, 7); 
+  Serial.println(z, 7);
 
   float w = *( (float*)(buffer + 14) );
   Serial.print("w = ");
-  Serial.println(w, 7); 
+  Serial.println(w, 7);
 }
 
 boolean checkCRC(uint8_t *buffer) {
@@ -213,7 +213,7 @@ void printButtonState(char buttonState) {
     Serial.println("released");
   }
   else if (buttonState == '1') {
-    Serial.println("pressed"); 
+    Serial.println("pressed");
   }
   else {
     Serial.println("unknown state");
