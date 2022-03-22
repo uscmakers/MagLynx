@@ -7,6 +7,17 @@ const int BR_SERVO_PIN = 9;
 
 enum legFlag {fl, fr, bl, br};
 
+Servo flServo,
+      frServo,
+      blServo,
+      brServo;
+
+// update these pins 1002
+int flMagnet = 5,
+    frMagnet = 5,
+    blMagnet = 5,
+    brMagnet = 5; 
+
 void setup() {
   // put your setup code here, to run once:
   // Variable name key:
@@ -14,20 +25,8 @@ void setup() {
   //   frontRight = fr
   //   backLeft   = bl
   //   backRight  = br
-  
 
-  
-  Servo flServo, 
-        frServo, 
-        blServo, 
-        brServo;
 
-  // update these pins 1002
-  int flMagnet = 5, 
-      frMagnet = 5, 
-      blMagnet = 5, 
-      brMagnet = 5;   
-  
   // Attach servos to servo pins
   flServo.attach(FL_SERVO_PIN);
   frServo.attach(FR_SERVO_PIN);
@@ -53,10 +52,10 @@ void loop() {
   else if(direction == -1){   // backward
 
   }
-  
+
 }
 
 // returns: direction: 1 = forward, -1 = backward, 0 = stop
-int getDirectionFromBLE(){    
+int getDirectionFromBLE(){
   // call a lot of BLE functions
 }
