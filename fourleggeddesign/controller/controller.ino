@@ -92,11 +92,11 @@ void loop(void)
   uint8_t len = readPacket(&bleuart, 500);
   if (len == 0) return;
 
-  // Got a packet!
+  // Received packet
   // printHex(packetbuffer, len);
 
   // Color
-  if (packetbuffer[1] == 'C') {
+  /*if (packetbuffer[1] == 'C') {
     uint8_t red = packetbuffer[2];
     uint8_t green = packetbuffer[3];
     uint8_t blue = packetbuffer[4];
@@ -107,7 +107,7 @@ void loop(void)
     Serial.print(green, HEX);
     if (blue < 0x10) Serial.print("0");
     Serial.println(blue, HEX);
-  }
+  }*/
 
   // Buttons
   if (packetbuffer[1] == 'B') {
@@ -122,7 +122,7 @@ void loop(void)
   }
 
   // GPS Location
-  if (packetbuffer[1] == 'L') {
+  /*if (packetbuffer[1] == 'L') {
     float lat, lon, alt;
     lat = parsefloat(packetbuffer+2);
     lon = parsefloat(packetbuffer+6);
@@ -133,10 +133,10 @@ void loop(void)
     Serial.print("Lon: "); Serial.print(lon, 4); // 4 digits of precision!
     Serial.print('\t');
     Serial.print(alt, 4); Serial.println(" meters");
-  }
+  }*/
 
   // Accelerometer
-  if (packetbuffer[1] == 'A') {
+  /*if (packetbuffer[1] == 'A') {
     float x, y, z;
     x = parsefloat(packetbuffer+2);
     y = parsefloat(packetbuffer+6);
@@ -145,10 +145,10 @@ void loop(void)
     Serial.print(x); Serial.print('\t');
     Serial.print(y); Serial.print('\t');
     Serial.print(z); Serial.println();
-  }
+  }*/
 
   // Magnetometer
-  if (packetbuffer[1] == 'M') {
+  /*if (packetbuffer[1] == 'M') {
     float x, y, z;
     x = parsefloat(packetbuffer+2);
     y = parsefloat(packetbuffer+6);
@@ -157,10 +157,10 @@ void loop(void)
     Serial.print(x); Serial.print('\t');
     Serial.print(y); Serial.print('\t');
     Serial.print(z); Serial.println();
-  }
+  }*/
 
   // Gyroscope
-  if (packetbuffer[1] == 'G') {
+  /*if (packetbuffer[1] == 'G') {
     float x, y, z;
     x = parsefloat(packetbuffer+2);
     y = parsefloat(packetbuffer+6);
@@ -169,10 +169,10 @@ void loop(void)
     Serial.print(x); Serial.print('\t');
     Serial.print(y); Serial.print('\t');
     Serial.print(z); Serial.println();
-  }
+  }*/
 
   // Quaternions
-  if (packetbuffer[1] == 'Q') {
+  /*if (packetbuffer[1] == 'Q') {
     float x, y, z, w;
     x = parsefloat(packetbuffer+2);
     y = parsefloat(packetbuffer+6);
@@ -183,5 +183,5 @@ void loop(void)
     Serial.print(y); Serial.print('\t');
     Serial.print(z); Serial.print('\t');
     Serial.print(w); Serial.println();
-  }
+  }*/
 }
