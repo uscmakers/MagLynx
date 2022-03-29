@@ -13,6 +13,7 @@
 *********************************************************************/
 
 #include <bluefruit.h>
+#include <Servo.h>
 
 // OTA DFU service
 BLEDfu bledfu;
@@ -28,8 +29,37 @@ void    printHex   (const uint8_t * data, const uint32_t numBytes);
 // Packet buffer
 extern uint8_t packetbuffer[];
 
+const int FL_SERVO_PIN = 9;
+const int FR_SERVO_PIN = 9;
+const int BL_SERVO_PIN = 9;
+const int BR_SERVO_PIN = 9;
+
+enum legFlag {fl, fr, bl, br};
+
+Servo flServo,
+      frServo,
+      blServo,
+      brServo;
+
+int flSolenoid = 5,
+    frSolenoid = 5,
+    blSolenoid = 5,
+    brSolenoid = 5;
+
+boolean isUpright = true;
+
 void setup(void)
 {
+  flServo.attach(FL_SERVO_PIN);
+  frServo.attach(FR_SERVO_PIN);
+  blServo.attach(BL_SERVO_PIN);
+  brServo.attach(BR_SERVO_PIN);
+
+  pinMode(flSolenoid, OUTPUT);
+  pinMode(frSolenoid, OUTPUT);
+  pinMode(blSolenoid, OUTPUT);
+  pinMode(brSolenoid, OUTPUT);
+
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
@@ -109,6 +139,13 @@ void loop(void)
     Serial.println(blue, HEX);
   }*/
 
+  //move both front legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+  //move both front legs backwards and both back legs backwards (pick up solenoids, move servos 45 deg backwards, drop solenoids)
+  //move both back legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+
+  int count = 0;
+  int pos = 0;
+
   // Buttons
   if (packetbuffer[1] == 'B') {
     uint8_t buttnum = packetbuffer[2] - '0';
@@ -119,6 +156,91 @@ void loop(void)
     } else {
       Serial.println(" released");
     }
+
+    if(buttNum == 1 && pressed){    // 1 button
+      digitalWrite(flSolenoid, HIGH);
+      flServo.write(flServo.read()+45);
+    }else if(buttNum == 1 && !pressed){
+      digitalWrite(flSolenoid, LOW);
+    }
+
+    if(buttNum == 2 && pressed){    // 2 button
+      digitalWrite(frSolenoid, HIGH);
+      frServo.write(frServo.read()+45);
+    }else if(buttNum == 2 && !pressed){
+      digitalWrite(frSolenoid, LOW);
+    }
+
+    if(buttNum == 3 && pressed){    // 3 button
+      digitalWrite(blSolenoid, HIGH);
+      blServo.write(blServo.read()+45);
+    }else if(buttNum == 3 && !pressed){
+      digitalWrite(blSolenoid, LOW);
+    }
+
+    if(buttNum == 4 && pressed){    // 4 button
+      digitalWrite(brSolenoid, HIGH);
+      brServo.write(brServo.read()+45);
+    }else if(buttNum == 1 && !pressed){
+      digitalWrite(brSolenoid, LOW);
+    }
+
+    //move both front legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+    //move both front legs backwards and both back legs backwards (pick up solenoids, move servos 45 deg backwards, drop solenoids)
+    //move both back legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+
+    if(buttNum == 5 && pressed && isUpright){    // up button
+      //move forward
+      //fr & bl solenoid
+      //fl & br servos move 90 degrees
+      isUpright = false;
+      move_forwards(frSolenoid, frServo);
+      move_forwards(flSolenoid, flServo);
+      delay(15);
+      move_backwards(frSolenoid, frServo);
+      move_backwards(flSolenoid, flServo);
+      move_backwards(brSolenoid, brServo);
+      move_backwards(blSolenoid, blServo);
+      delay(15);
+      move_forwards(blSolenoid, blServo);
+      move_forwards(brSolenoid, brServo);
+      isUpright = true;
+    }
+    if(buttNum == 6 && pressed && isUpright){    // down button
+      //move backwards
+      isUpright = false;
+      move_backwards(blSolenoid, blServo);
+      move_backwards(brSolenoid, brServo);
+      delay(15);
+      move_forwards(frSolenoid, frServo);
+      move_forwards(flSolenoid, flServo);
+      move_forwards(brSolenoid, brServo);
+      move_forwards(blSolenoid, blServo);
+      delay(15);
+      move_backwards(flSolenoid, flServo);
+      move_backwards(frSolenoid, frServo);
+      isUpright = true;
+    }
+    if(buttNum == 7 && pressed){    // left button
+      // nothing?
+    }
+    if(buttNum == 8 && pressed){    // right button
+      // nothing?
+    }
+    delay(15);
+
+  }
+
+  void move_forwards(int Solenoid, Servo Servo){
+    digitalWrite(Solenoid, HIGH);
+    Servo.write(Servo.read()+45);
+    digitalWrite(Solenoid, LOW);
+  }
+
+  void move_backwards(int Solenoid, Servo Servo){
+    digitalWrite(Solenoid, HIGH);
+    Servo.write(Servo.read()-45);
+    digitalWrite(Solenoid, LOW);
   }
 
   // GPS Location
