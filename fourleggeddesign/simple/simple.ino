@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-const int SERVO_PIN = 9;
+const int SERVO_PIN = 6;
 const int SOLENOID_PIN = 10;
 Servo servo;
 
