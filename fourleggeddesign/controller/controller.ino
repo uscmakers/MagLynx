@@ -29,10 +29,10 @@ void    printHex   (const uint8_t * data, const uint32_t numBytes);
 // Packet buffer
 extern uint8_t packetbuffer[];
 
-const int FL_SERVO_PIN = 9;
-const int FR_SERVO_PIN = 9;
-const int BL_SERVO_PIN = 9;
-const int BR_SERVO_PIN = 9;
+const int FL_SERVO_PIN = 5;
+const int FR_SERVO_PIN = 6;
+const int BL_SERVO_PIN = 7;
+const int BR_SERVO_PIN = 8;
 
 enum legFlag {fl, fr, bl, br};
 
@@ -41,12 +41,14 @@ Servo flServo,
       blServo,
       brServo;
 
-int flSolenoid = 5,
-    frSolenoid = 5,
-    blSolenoid = 5,
-    brSolenoid = 5;
+int flSolenoid = 1,
+    frSolenoid = 2,
+    blSolenoid = 3,
+    brSolenoid = 4;
 
 boolean isUpright = true;
+uint8_t buttNum = 0;
+boolean pressed = false;
 
 void setup(void)
 {
@@ -60,6 +62,11 @@ void setup(void)
   pinMode(blSolenoid, OUTPUT);
   pinMode(brSolenoid, OUTPUT);
 
+  flServo.write(90);
+  frServo.write(90);
+  blServo.write(90);
+  brServo.write(90);
+      
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
@@ -116,46 +123,44 @@ void startAdv(void)
     @brief  Constantly poll for new command or response data
 */
 /**************************************************************************/
+
+void move_forwards(int Solenoid, Servo servo){
+    digitalWrite(Solenoid, HIGH);
+    delay(50);
+    servo.write(servo.read()+45);
+    delay(50);
+    digitalWrite(Solenoid, LOW);
+  }
+
+  void move_backwards(int Solenoid, Servo servo){
+    digitalWrite(Solenoid, HIGH);
+    delay(50);
+    servo.write(servo.read()-45);
+    delay(50);
+    digitalWrite(Solenoid, LOW);
+  }
+
+//move both front legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+//move both front legs backwards and both back legs backwards (pick up solenoids, move servos 45 deg backwards, drop solenoids)
+//move both back legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
+
 void loop(void)
 {
-  // Wait for new data to arrive
-  uint8_t len = readPacket(&bleuart, 500);
-  if (len == 0) return;
+  /*
+  if (pressed) {
+    Serial.print("entered loop, button pressed. isUpright=");
+    Serial.print(isUpright);
+    //Serial.print(", buttNum=");
+    Serial.println(buttNum);
+ 
+  } else {
+    //Serial.print("entered loop, button not pressed. isUpright=");
+    Serial.print(isUpright);
+    //Serial.print(", buttNum=");    
+    Serial.println(buttNum);
+  }
+  */
 
-  // Received packet
-  // printHex(packetbuffer, len);
-
-  // Color
-  /*if (packetbuffer[1] == 'C') {
-    uint8_t red = packetbuffer[2];
-    uint8_t green = packetbuffer[3];
-    uint8_t blue = packetbuffer[4];
-    Serial.print ("RGB #");
-    if (red < 0x10) Serial.print("0");
-    Serial.print(red, HEX);
-    if (green < 0x10) Serial.print("0");
-    Serial.print(green, HEX);
-    if (blue < 0x10) Serial.print("0");
-    Serial.println(blue, HEX);
-  }*/
-
-  //move both front legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
-  //move both front legs backwards and both back legs backwards (pick up solenoids, move servos 45 deg backwards, drop solenoids)
-  //move both back legs forward (pick up solenoid, move servo 45 deg forward, drop solenoids)
-
-  int count = 0;
-  int pos = 0;
-
-  // Buttons
-  if (packetbuffer[1] == 'B') {
-    uint8_t buttnum = packetbuffer[2] - '0';
-    boolean pressed = packetbuffer[3] - '0';
-    Serial.print ("Button "); Serial.print(buttnum);
-    if (pressed) {
-      Serial.println(" pressed");
-    } else {
-      Serial.println(" released");
-    }
 
     if(buttNum == 1 && pressed){    // 1 button
       digitalWrite(flSolenoid, HIGH);
@@ -193,33 +198,41 @@ void loop(void)
       //move forward
       //fr & bl solenoid
       //fl & br servos move 90 degrees
-      isUpright = false;
-      move_forwards(frSolenoid, frServo);
-      move_forwards(flSolenoid, flServo);
-      delay(15);
-      move_backwards(frSolenoid, frServo);
-      move_backwards(flSolenoid, flServo);
-      move_backwards(brSolenoid, brServo);
-      move_backwards(blSolenoid, blServo);
-      delay(15);
-      move_forwards(blSolenoid, blServo);
-      move_forwards(brSolenoid, brServo);
-      isUpright = true;
+        isUpright = false;
+        //Serial.println("upButt pressed, moving forward fronts, the backs, then all");
+        move_forwards(frSolenoid, frServo);
+        delay(50);
+        move_forwards(flSolenoid, flServo);
+        delay(50);
+        flServo.write(flServo.read()-45);
+        frServo.write(frServo.read()-45);
+        blServo.write(blServo.read()-45);
+        brServo.write(brServo.read()-45);
+        delay(50);
+        move_forwards(blSolenoid, blServo);
+        delay(50);
+        move_forwards(brSolenoid, brServo);
+        isUpright = true;
+      delay(1000);
     }
     if(buttNum == 6 && pressed && isUpright){    // down button
       //move backwards
-      isUpright = false;
-      move_backwards(blSolenoid, blServo);
-      move_backwards(brSolenoid, brServo);
-      delay(15);
-      move_forwards(frSolenoid, frServo);
-      move_forwards(flSolenoid, flServo);
-      move_forwards(brSolenoid, brServo);
-      move_forwards(blSolenoid, blServo);
-      delay(15);
-      move_backwards(flSolenoid, flServo);
-      move_backwards(frSolenoid, frServo);
-      isUpright = true;
+        isUpright = false;
+        //Serial.println("down pressed, moving backwards");
+        move_backwards(blSolenoid, blServo);
+        delay(50);
+        move_backwards(brSolenoid, brServo);
+        delay(50);
+        flServo.write(flServo.read()+45);
+        frServo.write(frServo.read()+45);
+        blServo.write(blServo.read()+45);
+        brServo.write(brServo.read()+45);
+        delay(50);
+        move_backwards(flSolenoid, flServo);
+        delay(50);
+        move_backwards(frSolenoid, frServo);
+        isUpright = true;
+      delay(1000);
     }
     if(buttNum == 7 && pressed){    // left button
       // nothing?
@@ -227,83 +240,23 @@ void loop(void)
     if(buttNum == 8 && pressed){    // right button
       // nothing?
     }
-    delay(15);
 
+  // Wait for new data to arrive
+  uint8_t len = readPacket(&bleuart, 500);
+  if (len == 0) return;
+
+  // Buttons
+  if (packetbuffer[1] == 'B') {
+    buttNum = packetbuffer[2] - '0';
+    pressed = packetbuffer[3] - '0';
+    Serial.print ("Button "); Serial.print(buttNum);
+    if (pressed) {
+      Serial.println(" pressed");
+    } else {
+      Serial.println(" released");
+    }
   }
+    
+    delay(100);
 
-  void move_forwards(int Solenoid, Servo Servo){
-    digitalWrite(Solenoid, HIGH);
-    Servo.write(Servo.read()+45);
-    digitalWrite(Solenoid, LOW);
-  }
-
-  void move_backwards(int Solenoid, Servo Servo){
-    digitalWrite(Solenoid, HIGH);
-    Servo.write(Servo.read()-45);
-    digitalWrite(Solenoid, LOW);
-  }
-
-  // GPS Location
-  /*if (packetbuffer[1] == 'L') {
-    float lat, lon, alt;
-    lat = parsefloat(packetbuffer+2);
-    lon = parsefloat(packetbuffer+6);
-    alt = parsefloat(packetbuffer+10);
-    Serial.print("GPS Location\t");
-    Serial.print("Lat: "); Serial.print(lat, 4); // 4 digits of precision!
-    Serial.print('\t');
-    Serial.print("Lon: "); Serial.print(lon, 4); // 4 digits of precision!
-    Serial.print('\t');
-    Serial.print(alt, 4); Serial.println(" meters");
-  }*/
-
-  // Accelerometer
-  /*if (packetbuffer[1] == 'A') {
-    float x, y, z;
-    x = parsefloat(packetbuffer+2);
-    y = parsefloat(packetbuffer+6);
-    z = parsefloat(packetbuffer+10);
-    Serial.print("Accel\t");
-    Serial.print(x); Serial.print('\t');
-    Serial.print(y); Serial.print('\t');
-    Serial.print(z); Serial.println();
-  }*/
-
-  // Magnetometer
-  /*if (packetbuffer[1] == 'M') {
-    float x, y, z;
-    x = parsefloat(packetbuffer+2);
-    y = parsefloat(packetbuffer+6);
-    z = parsefloat(packetbuffer+10);
-    Serial.print("Mag\t");
-    Serial.print(x); Serial.print('\t');
-    Serial.print(y); Serial.print('\t');
-    Serial.print(z); Serial.println();
-  }*/
-
-  // Gyroscope
-  /*if (packetbuffer[1] == 'G') {
-    float x, y, z;
-    x = parsefloat(packetbuffer+2);
-    y = parsefloat(packetbuffer+6);
-    z = parsefloat(packetbuffer+10);
-    Serial.print("Gyro\t");
-    Serial.print(x); Serial.print('\t');
-    Serial.print(y); Serial.print('\t');
-    Serial.print(z); Serial.println();
-  }*/
-
-  // Quaternions
-  /*if (packetbuffer[1] == 'Q') {
-    float x, y, z, w;
-    x = parsefloat(packetbuffer+2);
-    y = parsefloat(packetbuffer+6);
-    z = parsefloat(packetbuffer+10);
-    w = parsefloat(packetbuffer+14);
-    Serial.print("Quat\t");
-    Serial.print(x); Serial.print('\t');
-    Serial.print(y); Serial.print('\t');
-    Serial.print(z); Serial.print('\t');
-    Serial.print(w); Serial.println();
-  }*/
 }
