@@ -29,10 +29,10 @@ void    printHex   (const uint8_t * data, const uint32_t numBytes);
 // Packet buffer
 extern uint8_t packetbuffer[];
 
-const int FL_SERVO_PIN = 5;
-const int FR_SERVO_PIN = 6;
-const int BL_SERVO_PIN = 7;
-const int BR_SERVO_PIN = 8;
+const int FL_SERVO_PIN = 8;     //yellow wire
+const int FR_SERVO_PIN = 11;    //blue wire
+const int BL_SERVO_PIN = 4;      //brown wire
+const int BR_SERVO_PIN = 15;    //purple wire
 
 enum legFlag {fl, fr, bl, br};
 
@@ -41,10 +41,10 @@ Servo flServo,
       blServo,
       brServo;
 
-int flSolenoid = 1,
-    frSolenoid = 2,
+int flSolenoid = 9,
+    frSolenoid = 10,
     blSolenoid = 3,
-    brSolenoid = 4;
+    brSolenoid = 1;
 
 boolean isUpright = true;
 uint8_t buttNum = 0;
