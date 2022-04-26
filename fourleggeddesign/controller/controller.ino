@@ -126,17 +126,17 @@ void startAdv(void)
 
 void move_forwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
-    delay(3000);
+    delay(5000);
     servo.write(servo.read()+45);
-    delay(3000);
+    delay(5000);
     digitalWrite(Solenoid, LOW);
   }
 
   void move_backwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
-    delay(3000);
+    delay(5000);
     servo.write(servo.read()-45);
-    delay(3000);
+    delay(5000);
     digitalWrite(Solenoid, LOW);
   }
 
@@ -201,38 +201,38 @@ void loop(void)
         isUpright = false;
         //Serial.println("upButt pressed, moving forward fronts, the backs, then all");
         move_forwards(frSolenoid, frServo);
-        delay(3000);
+        delay(5000);
         move_forwards(flSolenoid, flServo);
-        delay(3000);
+        delay(5000);
         flServo.write(flServo.read()-45);
         frServo.write(frServo.read()-45);
         blServo.write(blServo.read()-45);
         brServo.write(brServo.read()-45);
         delay(50);
         move_forwards(blSolenoid, blServo);
-        delay(3000);
+        delay(5000);
         move_forwards(brSolenoid, brServo);
         isUpright = true;
-      delay(3000);
+      delay(5000);
     }
     if(buttNum == 6 && pressed && isUpright){    // down button
       //move backwards
         isUpright = false;
         //Serial.println("down pressed, moving backwards");
         move_backwards(blSolenoid, blServo);
-        delay(3000);
+        delay(5000);
         move_backwards(brSolenoid, brServo);
-        delay(3000);
+        delay(5000);
         flServo.write(flServo.read()+45);
         frServo.write(frServo.read()+45);
         blServo.write(blServo.read()+45);
         brServo.write(brServo.read()+45);
         delay(50);
         move_backwards(flSolenoid, flServo);
-        delay(3000);
+        delay(5000);
         move_backwards(frSolenoid, frServo);
         isUpright = true;
-      delay(3000);
+      delay(5000);
     }
     if(buttNum == 7 && pressed){    // left button
       // nothing?
