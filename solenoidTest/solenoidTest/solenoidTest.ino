@@ -1,7 +1,8 @@
-const int flSolenoid = 1,
-          frSolenoid = 2,
-          blSolenoid = 3,
-          brSolenoid = 4;
+int flSolenoid = 1,
+    frSolenoid = 2,
+    blSolenoid = 3,
+    brSolenoid = 4;
+          
 void setup() {
   // put your setup code here, to run once:
   // just want to set up solenoids as outputs, then turn them on and off again
@@ -20,10 +21,11 @@ void loop() {
 
   delay(1500);
 
-  digitalWrite(flSolenoid, LOW);
-  digitalWrite(frSolenoid, LOW);
-  digitalWrite(blSolenoid, LOW);
-  digitalWrite(brSolenoid, LOW);
-  delay(1500);
+  //digitalWrite(flSolenoid, LOW);
+  //digitalWrite(frSolenoid, LOW);
+  //digitalWrite(blSolenoid, LOW);
+  //digitalWrite(brSolenoid, LOW);
+  
+  //delay(1500);
 
 }
