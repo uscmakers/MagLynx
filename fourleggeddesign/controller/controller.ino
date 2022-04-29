@@ -62,13 +62,19 @@ void setup(void)
   pinMode(blSolenoid, OUTPUT);
   pinMode(brSolenoid, OUTPUT);
 
+  digitalWrite(flSolenoid, LOW);
+  digitalWrite(frSolenoid, LOW);
+  digitalWrite(blSolenoid, LOW);
+  digitalWrite(brSolenoid, LOW);
+
+
   flServo.write(90);
   frServo.write(90);
   blServo.write(90);
   brServo.write(90);
 
   Serial.begin(115200);
-  while ( !Serial ) delay(10);   // for nrf52840 with native usb
+//  while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
   Serial.println(F("Adafruit Bluefruit52 Controller App Example"));
   Serial.println(F("-------------------------------------------"));
@@ -126,17 +132,17 @@ void startAdv(void)
 
 void move_forwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
-    delay(5000);
+    delay(500);
     servo.write(servo.read()+45);
-    delay(5000);
+    delay(500);
     digitalWrite(Solenoid, LOW);
   }
 
   void move_backwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
-    delay(5000);
+    delay(500);
     servo.write(servo.read()-45);
-    delay(5000);
+    delay(500);
     digitalWrite(Solenoid, LOW);
   }
 
@@ -201,38 +207,38 @@ void loop(void)
         isUpright = false;
         //Serial.println("upButt pressed, moving forward fronts, the backs, then all");
         move_forwards(frSolenoid, frServo);
-        delay(5000);
+        delay(500);
         move_forwards(flSolenoid, flServo);
-        delay(5000);
+        delay(500);
         flServo.write(flServo.read()-45);
         frServo.write(frServo.read()-45);
         blServo.write(blServo.read()-45);
         brServo.write(brServo.read()-45);
         delay(50);
         move_forwards(blSolenoid, blServo);
-        delay(5000);
+        delay(500);
         move_forwards(brSolenoid, brServo);
         isUpright = true;
-      delay(5000);
+      delay(500);
     }
     if(buttNum == 6 && pressed && isUpright){    // down button
       //move backwards
         isUpright = false;
         //Serial.println("down pressed, moving backwards");
         move_backwards(blSolenoid, blServo);
-        delay(5000);
+        delay(500);
         move_backwards(brSolenoid, brServo);
-        delay(5000);
+        delay(500);
         flServo.write(flServo.read()+45);
         frServo.write(frServo.read()+45);
         blServo.write(blServo.read()+45);
         brServo.write(brServo.read()+45);
         delay(50);
         move_backwards(flSolenoid, flServo);
-        delay(5000);
+        delay(500);
         move_backwards(frSolenoid, frServo);
         isUpright = true;
-      delay(5000);
+      delay(500);
     }
     if(buttNum == 7 && pressed){    // left button
       // nothing?
