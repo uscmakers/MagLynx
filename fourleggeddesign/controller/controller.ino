@@ -133,7 +133,7 @@ void startAdv(void)
 void move_forwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
     delay(500);
-    servo.write(servo.read()+45);
+    servo.write(servo.read()+30);
     delay(500);
     digitalWrite(Solenoid, LOW);
   }
@@ -141,7 +141,7 @@ void move_forwards(int Solenoid, Servo servo){
   void move_backwards(int Solenoid, Servo servo){
     digitalWrite(Solenoid, HIGH);
     delay(500);
-    servo.write(servo.read()-45);
+    servo.write(servo.read()-30);
     delay(500);
     digitalWrite(Solenoid, LOW);
   }
@@ -208,16 +208,17 @@ void loop(void)
         //Serial.println("upButt pressed, moving forward fronts, the backs, then all");
         move_forwards(frSolenoid, frServo);
         delay(500);
-        move_forwards(flSolenoid, flServo);
+        move_backwards(flSolenoid, flServo);
         delay(500);
-        flServo.write(flServo.read()-45);
-        frServo.write(frServo.read()-45);
-        blServo.write(blServo.read()-45);
-        brServo.write(brServo.read()-45);
+        flServo.write(flServo.read()+30);
+        frServo.write(frServo.read()-30);
+        blServo.write(blServo.read()-30);
+        delay(500);
+        brServo.write(brServo.read()+30);
         delay(50);
         move_forwards(blSolenoid, blServo);
         delay(500);
-        move_forwards(brSolenoid, brServo);
+        move_backwards(brSolenoid, brServo);
         isUpright = true;
       delay(500);
     }
@@ -225,18 +226,18 @@ void loop(void)
       //move backwards
         isUpright = false;
         //Serial.println("down pressed, moving backwards");
-        move_backwards(blSolenoid, blServo);
+        move_forwards(blSolenoid, blServo);
         delay(500);
         move_backwards(brSolenoid, brServo);
         delay(500);
         flServo.write(flServo.read()+45);
-        frServo.write(frServo.read()+45);
-        blServo.write(blServo.read()+45);
+        frServo.write(frServo.read()-45);
+        blServo.write(blServo.read()-45);
         brServo.write(brServo.read()+45);
         delay(50);
         move_backwards(flSolenoid, flServo);
         delay(500);
-        move_backwards(frSolenoid, frServo);
+        move_forwards(frSolenoid, frServo);
         isUpright = true;
       delay(500);
     }
